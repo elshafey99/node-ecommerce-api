@@ -131,13 +131,13 @@ node learning/04-esm.js
 node learning/04-commonjs.cjs
 ```
 
-| File                                      | What it shows                                                                        |
-| ----------------------------------------- | ------------------------------------------------------------------------------------ |
-| `learning/01-event-loop.js`               | `nextTick` and Promises before timers; `setImmediate` before `setTimeout` inside I/O |
-| `learning/02-callbacks-promises-async.js` | Callback → `new Promise` → `util.promisify` → `fs/promises` → `async/await`          |
-| `learning/03-raw-http-server.js`          | `node:http`, the API Express wraps                                                   |
-| `learning/04-esm.js`                      | `import`, `import.meta.url`, no `__dirname`                                          |
-| `learning/04-commonjs.cjs`                | `require`, `module.exports`, `__filename`                                            |
+| File                                      | What it shows                                                                                            |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `learning/01-event-loop.js`               | ESM: Promise then `nextTick`, then timers. Inside I/O: `nextTick`, Promise, `setImmediate`, `setTimeout` |
+| `learning/02-callbacks-promises-async.js` | Callback → `new Promise` → `util.promisify` → `fs/promises` → `async/await`                              |
+| `learning/03-raw-http-server.js`          | `node:http`, the API Express wraps                                                                       |
+| `learning/04-esm.js`                      | `import`, `import.meta.url`, no `__dirname`                                                              |
+| `learning/04-commonjs.cjs`                | `require`, `module.exports`, `__filename`                                                                |
 
 ## Project layout
 

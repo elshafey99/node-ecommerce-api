@@ -23,13 +23,15 @@ app.use(helmet());
 // Like HandleCors / config/cors.php. Wide open for local learning.
 app.use(cors());
 
-// Parses a JSON body onto req.body. Like reading $request->json().
-app.use(express.json());
-
 // Access log while developing. `php artisan serve` does not do this by default.
+// Registered before the body parser: a bad JSON body calls next(err) and skips
+// any middleware that comes after it, so the log would miss that request.
 if (env.nodeEnv === 'development') {
   app.use(morgan('dev'));
 }
+
+// Parses a JSON body onto req.body. Like reading $request->json().
+app.use(express.json());
 
 app.use(apiRoutes);
 

@@ -1,39 +1,52 @@
 /**
- * Event loop order: process.nextTick, Promise, setTimeout, setImmediate.
+ * Event loop: sync code, Promises, process.nextTick, setTimeout, setImmediate.
  *
  * Run:
  *   node learning/01-event-loop.js
  *
- * PHP handles one request, then the worker is free. Node keeps a single
- * thread and a loop that drains queues. Microtasks (nextTick, Promises) run
- * before the loop moves to the next phase.
+ * PHP runs a request and returns the worker. Node keeps one thread and drains
+ * queues: the current stack, then microtasks, then loop phases
+ * (timers → poll/I/O → check).
  *
- * setTimeout vs setImmediate from the top level is NOT stable: either timer
- * phase or check phase may run first. Inside an I/O callback, setImmediate
- * (check phase) always runs before the next setTimeout (timers phase).
+ * This file is ESM. Node evaluates an ESM entry file inside the microtask
+ * queue, so a Promise queued at the top runs before process.nextTick. The
+ * same two calls in a CommonJS file run nextTick first (see the Node docs for
+ * process.nextTick). Inside the I/O callback below, nextTick is first either
+ * way — that callback is a later turn of the loop.
+ *
+ * setTimeout(0) vs setImmediate at the top level can swap. Inside an I/O
+ * callback, setImmediate (check) always runs before the next setTimeout (timers).
  */
 
 import fs from 'node:fs';
 
-console.log('sync: start');
+console.log('1 sync start');
 
-setTimeout(() => console.log('top-level setTimeout (timers phase)'), 0);
-setImmediate(() => console.log('top-level setImmediate (check phase)'));
+setTimeout(() => {
+  console.log('4 top-level setTimeout (timers — may print before or after setImmediate)');
+}, 0);
+setImmediate(() => {
+  console.log('4 top-level setImmediate (check — may print before or after setTimeout)');
+});
 
-Promise.resolve().then(() => console.log('promise (microtask, after nextTick)'));
-process.nextTick(() => console.log('nextTick (microtask, before Promises)'));
+Promise.resolve().then(() => {
+  console.log('2 top-level promise (before nextTick: this file is ESM)');
+});
+process.nextTick(() => {
+  console.log('3 top-level nextTick (after that promise, still before timers)');
+});
 
-console.log('sync: end');
+console.log('1 sync end');
 
 fs.readFile(new URL('./01-event-loop.js', import.meta.url), (err) => {
   if (err) {
     throw err;
   }
 
-  console.log('--- inside I/O; the next four lines stay in this order ---');
+  console.log('--- I/O callback: the next four lines stay in this order ---');
 
-  setTimeout(() => console.log('io setTimeout'), 0);
-  setImmediate(() => console.log('io setImmediate'));
-  Promise.resolve().then(() => console.log('io promise'));
-  process.nextTick(() => console.log('io nextTick'));
+  setTimeout(() => console.log('8 io setTimeout'), 0);
+  setImmediate(() => console.log('7 io setImmediate'));
+  Promise.resolve().then(() => console.log('6 io promise'));
+  process.nextTick(() => console.log('5 io nextTick'));
 });

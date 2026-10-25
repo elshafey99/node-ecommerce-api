@@ -2,7 +2,9 @@ import dotenv from 'dotenv';
 
 // Laravel loads .env before the app boots. Node does not, so we do it here.
 // Other files should import `env` instead of reading process.env themselves.
-dotenv.config();
+// quiet: dotenv 18 prints "injected env..." on stderr every boot. A missing
+// .env is normal; the defaults below match .env.example.
+dotenv.config({ quiet: true });
 
 function readPort(value, fallback) {
   const port = Number(value);
