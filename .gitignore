@@ -1,0 +1,21 @@
+# dependencies
+node_modules/
+
+# environment — copy .env.example to .env locally
+.env
+.env.*
+!.env.example
+
+# logs
+logs/
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# test and build output (later phases)
+coverage/
+dist/
